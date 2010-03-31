@@ -1,0 +1,20 @@
+Fast Debugger (ruby-debug-ide 0.4.9) listens on :39767
+
+**Notice: C extension not loaded. This is required for optimum MongoDB Ruby driver performance.
+  You can install the extension as follows:
+  gem install mongo_ext
+
+  If you continue to receive this message after installing, make sure that the
+  mongo_ext gem is in your load path and that the mongo_ext and mongo gems are of the same version.
+
+	/usr/lib/ruby/gems/1.8/gems/activesupport-2.3.5/lib/active_support/dependencies.rb:156:in `require'
+	/usr/lib/ruby/gems/1.8/gems/activesupport-2.3.5/lib/active_support/dependencies.rb:156:in `require'
+	/usr/lib/ruby/gems/1.8/gems/activesupport-2.3.5/lib/active_support/dependencies.rb:521:in `new_constants_in'
+	/usr/lib/ruby/gems/1.8/gems/activesupport-2.3.5/lib/active_support/dependencies.rb:156:in `require'
+	./lib/init.rb:10
+	/usr/lib/ruby/gems/1.8/gems/ruby-debug-ide-0.4.9/lib/ruby-debug-ide.rb:109:in `debug_load'
+	/usr/lib/ruby/gems/1.8/gems/ruby-debug-ide-0.4.9/lib/ruby-debug-ide.rb:109:in `debug_program'
+	/usr/lib/ruby/gems/1.8/gems/ruby-debug-ide-0.4.9/bin/rdebug-ide:87
+	/usr/bin/rdebug-ide:19:in `load'
+	/usr/bin/rdebug-ide:19
+Uncaught exception: no such file to load -- access_denied_error
