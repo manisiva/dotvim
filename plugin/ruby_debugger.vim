@@ -3,7 +3,9 @@
 map <Leader>b  :call g:RubyDebugger.toggle_breakpoint()<CR>
 map <Leader>v  :call g:RubyDebugger.open_variables()<CR>
 map <Leader>m  :call g:RubyDebugger.open_breakpoints()<CR>
+map <Leader>t  :call g:RubyDebugger.open_frames()<CR>
 map <Leader>s  :call g:RubyDebugger.step()<CR>
+map <Leader>f  :call g:RubyDebugger.finish()<CR>
 map <Leader>n  :call g:RubyDebugger.next()<CR>
 map <Leader>c  :call g:RubyDebugger.continue()<CR>
 map <Leader>e  :call g:RubyDebugger.exit()<CR>
@@ -13,9 +15,12 @@ command! -nargs=? -complete=file Rdebugger :call g:RubyDebugger.start(<q-args>)
 command! -nargs=0 RdbStop :call g:RubyDebugger.stop() 
 command! -nargs=1 RdbCommand :call g:RubyDebugger.send_command(<q-args>) 
 command! -nargs=0 RdbTest :call g:RubyDebugger.run_test() 
+command! -nargs=1 RdbEval :call g:RubyDebugger.eval(<q-args>)
+command! -nargs=1 RdbCond :call g:RubyDebugger.conditional_breakpoint(<q-args>)
+command! -nargs=1 RdbCatch :call g:RubyDebugger.catch_exception(<q-args>)
 
 if exists("g:ruby_debugger_loaded")
-  finish
+  "finish
 endif
 if v:version < 700 
   echoerr "RubyDebugger: This plugin requires Vim >= 7."
@@ -48,6 +53,8 @@ let s:tmp_file = s:runtime_dir . '/tmp/ruby_debugger'
 let s:server_output_file = s:runtime_dir . '/tmp/ruby_debugger_output'
 " Default id for sign of current line
 let s:current_line_sign_id = 120
+let s:separator = "++vim-ruby-debugger separator++"
+let s:sign_id = 0
 
 " Create tmp directory if it doesn't exist
 if !isdirectory(s:runtime_dir . '/tmp')
@@ -140,24 +147,31 @@ function! s:unescape_html(html)
 endfunction
 
 
+function! s:quotify(exp)
+  let quoted = a:exp
+  let quoted = substitute(quoted, "\"", "\\\\\"", 'g')
+  return quoted
+endfunction
+
+
 " Get filename of current buffer
 function! s:get_filename()
   return expand("%:p")
 endfunction
 
 
-" TODO: Find way to improve its performance
 " Send message to debugger. This function should never be used explicitly,
 " only through g:RubyDebugger.send_command function
 function! s:send_message_to_debugger(message)
   if g:ruby_debugger_fast_sender
-    call system(s:runtime_dir . "/bin/socket " . s:hostname . " " . s:debugger_port . " '" . a:message . "'")
+    call system(s:runtime_dir . "/bin/socket " . s:hostname . " " . s:debugger_port . " \"" . a:message . "\"")
   else
     let script =  "ruby -e \"require 'socket'; "
     let script .= "attempts = 0; "
+    let script .= "a = nil; "
     let script .= "begin; "
     let script .=   "a = TCPSocket.open('" . s:hostname . "', " . s:debugger_port . "); "
-    let script .=   "a.puts('" . a:message . "'); "
+    let script .=   "a.puts(%q[" . substitute(substitute(a:message, '[', '\[', 'g'), ']', '\]', 'g') . "]);"
     let script .=   "a.close; "
     let script .= "rescue Errno::ECONNREFUSED; "
     let script .=   "attempts += 1; "
@@ -168,6 +182,8 @@ function! s:send_message_to_debugger(message)
     let script .=     "puts('" . s:hostname . ":" . s:debugger_port . " can not be opened'); "
     let script .=     "exit; "
     let script .=   "end; "
+    let script .= "ensure; "
+    let script .=   "a.close if a; "
     let script .= "end; \""
     let output = system(script)
     if output =~ 'can not be opened'
@@ -189,9 +205,13 @@ endfunction
 function! s:clear_current_state()
   call s:unplace_sign_of_current_line()
   let g:RubyDebugger.variables = {}
-  " Clear variables window (just show our empty variables Dict)
+  let g:RubyDebugger.frames = []
+  " Clear variables and frames window (just show our empty variables Dict)
   if s:variables_window.is_open()
     call s:variables_window.open()
+  endif
+  if s:frames_window.is_open()
+    call s:frames_window.open()
   endif
 endfunction
 
@@ -283,9 +303,58 @@ function! s:first_normal_window()
   return -1
 endfunction
 
+" *** Queue class (start)
+
+let s:Queue = {}
+
+" ** Public methods
+
+" Constructor of new queue.
+function! s:Queue.new() dict
+  let var = copy(self)
+  let var.queue = []
+  let var.after = ""
+  return var
+endfunction
+
+
+" Execute next command in the queue and remove it from queue
+function! s:Queue.execute() dict
+  if !empty(self.queue)
+    let message = join(self.queue, s:separator)
+    call self.empty()
+    call g:RubyDebugger.send_command(message)
+  endif
+endfunction
+
+
+" Execute 'after' hook only if queue is empty
+function! s:Queue.after_hook() dict
+  if self.after != "" && empty(self.queue)
+    call self.after()
+  endif
+endfunction
+
+
+function! s:Queue.add(element) dict
+  call add(self.queue, a:element)
+endfunction
+
+
+function! s:Queue.empty() dict
+  let self.queue = []
+endfunction
+
+
+" *** Queue class (end)
+
+
+
+
 " *** Public interface (start)
 
-let RubyDebugger = { 'commands': {}, 'variables': {}, 'settings': {}, 'breakpoints': [] }
+let RubyDebugger = { 'commands': {}, 'variables': {}, 'settings': {}, 'breakpoints': [], 'frames': [], 'exceptions': [] }
+let g:RubyDebugger.queue = s:Queue.new()
 
 
 " Run debugger server. It takes one optional argument with path to debugged
@@ -296,16 +365,13 @@ function! RubyDebugger.start(...) dict
   echo "Loading debugger..."
   call g:RubyDebugger.server.start(script)
 
-  " Send only first breakpoint to the debugger. All other breakpoints will be
-  " sent by 'set_breakpoint' command
-  let breakpoint = get(g:RubyDebugger.breakpoints, 0)
-  if type(breakpoint) == type({})
-    call breakpoint.send_to_debugger()
-  else
-    " if there are no breakpoints, just run the script
-    call g:RubyDebugger.send_command('start')
-  endif
+  let g:RubyDebugger.exceptions = []
+  for breakpoint in g:RubyDebugger.breakpoints
+    call g:RubyDebugger.queue.add(breakpoint.command())
+  endfor
+  call g:RubyDebugger.queue.add('start')
   echo "Debugger started"
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
@@ -324,26 +390,38 @@ endfunction
 " That's why +clientserver is required
 " This function analyzes the special file and gives handling to right command
 function! RubyDebugger.receive_command() dict
-  let cmd = join(readfile(s:tmp_file), "")
-  call g:RubyDebugger.logger.put("Received command: " . cmd)
-  " Clear command line
-  if !empty(cmd)
-    if match(cmd, '<breakpoint ') != -1
-      call g:RubyDebugger.commands.jump_to_breakpoint(cmd)
-    elseif match(cmd, '<suspended ') != -1
-      call g:RubyDebugger.commands.jump_to_breakpoint(cmd)
-    elseif match(cmd, '<breakpointAdded ') != -1
-      call g:RubyDebugger.commands.set_breakpoint(cmd)
-    elseif match(cmd, '<variables>') != -1
-      call g:RubyDebugger.commands.set_variables(cmd)
-    elseif match(cmd, '<error>') != -1
-      call g:RubyDebugger.commands.error(cmd)
-    elseif match(cmd, '<message>') != -1
-      call g:RubyDebugger.commands.message(cmd)
-    elseif match(cmd, '<eval ') != -1
-      call g:RubyDebugger.commands.eval(cmd)
+  let file_contents = join(readfile(s:tmp_file), "")
+  call g:RubyDebugger.logger.put("Received command: " . file_contents)
+  let commands = split(file_contents, s:separator)
+  for cmd in commands
+    if !empty(cmd)
+      if match(cmd, '<breakpoint ') != -1
+        call g:RubyDebugger.commands.jump_to_breakpoint(cmd)
+      elseif match(cmd, '<suspended ') != -1
+        call g:RubyDebugger.commands.jump_to_breakpoint(cmd)
+      elseif match(cmd, '<exception ') != -1
+        call g:RubyDebugger.commands.handle_exception(cmd)
+      elseif match(cmd, '<breakpointAdded ') != -1
+        call g:RubyDebugger.commands.set_breakpoint(cmd)
+      elseif match(cmd, '<catchpointSet ') != -1
+        call g:RubyDebugger.commands.set_exception(cmd)
+      elseif match(cmd, '<variables>') != -1
+        call g:RubyDebugger.commands.set_variables(cmd)
+      elseif match(cmd, '<error>') != -1
+        call g:RubyDebugger.commands.error(cmd)
+      elseif match(cmd, '<message>') != -1
+        call g:RubyDebugger.commands.message(cmd)
+      elseif match(cmd, '<eval ') != -1
+        call g:RubyDebugger.commands.eval(cmd)
+      elseif match(cmd, '<processingException ') != -1
+        call g:RubyDebugger.commands.processing_exception(cmd)
+      elseif match(cmd, '<frames>') != -1
+        call g:RubyDebugger.commands.trace(cmd)
+      endif
     endif
-  endif
+  endfor
+  call g:RubyDebugger.queue.after_hook()
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
@@ -356,6 +434,7 @@ let RubyDebugger.send_command = function("<SID>send_message_to_debugger")
 function! RubyDebugger.open_variables() dict
   call s:variables_window.toggle()
   call g:RubyDebugger.logger.put("Opened variables window")
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
@@ -363,11 +442,21 @@ endfunction
 function! RubyDebugger.open_breakpoints() dict
   call s:breakpoints_window.toggle()
   call g:RubyDebugger.logger.put("Opened breakpoints window")
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
-" Set/remove breakpoint at current position
-function! RubyDebugger.toggle_breakpoint() dict
+" Open frames window
+function! RubyDebugger.open_frames() dict
+  call s:frames_window.toggle()
+  call g:RubyDebugger.logger.put("Opened frames window")
+  call g:RubyDebugger.queue.execute()
+endfunction
+
+
+" Set/remove breakpoint at current position. If argument
+" is given, it will set conditional breakpoint (argument is condition)
+function! RubyDebugger.toggle_breakpoint(...) dict
   let line = line(".")
   let file = s:get_filename()
   let existed_breakpoints = filter(copy(g:RubyDebugger.breakpoints), 'v:val.line == ' . line . ' && v:val.file == "' . escape(file, '\') . '"')
@@ -387,6 +476,7 @@ function! RubyDebugger.toggle_breakpoint() dict
     call s:breakpoints_window.open()
     exe "wincmd p"
   endif
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
@@ -396,37 +486,99 @@ function! RubyDebugger.remove_breakpoints() dict
     call breakpoint.delete()
   endfor
   let g:RubyDebugger.breakpoints = []
+  call g:RubyDebugger.queue.execute()
+endfunction
+
+
+" Eval the passed in expression
+function! RubyDebugger.eval(exp) dict
+  let quoted = s:quotify(a:exp)
+  call g:RubyDebugger.queue.add("eval " . quoted)
+  call g:RubyDebugger.queue.execute()
+endfunction
+
+
+" Sets conditional breakpoint where cursor is placed
+function! RubyDebugger.conditional_breakpoint(exp) dict
+  let line = line(".")
+  let file = s:get_filename()
+  let existed_breakpoints = filter(copy(g:RubyDebugger.breakpoints), 'v:val.line == ' . line . ' && v:val.file == "' . escape(file, '\') . '"')
+  " If breakpoint with current file/line doesn't exist, create it. Otherwise -
+  " remove it
+  if empty(existed_breakpoints)
+    echo "You can set condition only to already set breakpoints. Move cursor to set breakpoint and add condition"
+  else
+    let breakpoint = existed_breakpoints[0]
+    let quoted = s:quotify(a:exp)
+    call breakpoint.add_condition(quoted)
+    " Update info in Breakpoints window
+    if s:breakpoints_window.is_open()
+      call s:breakpoints_window.open()
+      exe "wincmd p"
+    endif
+    call g:RubyDebugger.queue.execute()
+  endif
+endfunction
+
+
+" Catch all exceptions with given name
+function! RubyDebugger.catch_exception(exp) dict
+  if has_key(g:RubyDebugger, 'server') && g:RubyDebugger.server.is_running()
+    let quoted = s:quotify(a:exp)
+    let exception = s:Exception.new(quoted)
+    call add(g:RubyDebugger.exceptions, exception)
+    if s:breakpoints_window.is_open()
+      call s:breakpoints_window.open()
+      exe "wincmd p"
+    endif
+    call g:RubyDebugger.queue.execute()
+  else
+    echo "Sorry, but you can set Exceptional Breakpoints only with running debugger"
+  endif
 endfunction
 
 
 " Next
 function! RubyDebugger.next() dict
-  call g:RubyDebugger.send_command("next")
+  call g:RubyDebugger.queue.add("next")
   call s:clear_current_state()
   call g:RubyDebugger.logger.put("Step over")
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
 " Step
 function! RubyDebugger.step() dict
-  call g:RubyDebugger.send_command("step")
+  call g:RubyDebugger.queue.add("step")
   call s:clear_current_state()
   call g:RubyDebugger.logger.put("Step into")
+  call g:RubyDebugger.queue.execute()
+endfunction
+
+
+" Finish
+function! RubyDebugger.finish() dict
+  call g:RubyDebugger.queue.add("finish")
+  call s:clear_current_state()
+  call g:RubyDebugger.logger.put("Step out")
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
 " Continue
 function! RubyDebugger.continue() dict
-  call g:RubyDebugger.send_command("cont")
+  call g:RubyDebugger.queue.add("cont")
   call s:clear_current_state()
   call g:RubyDebugger.logger.put("Continue")
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
 " Exit
 function! RubyDebugger.exit() dict
-  call g:RubyDebugger.send_command("exit")
+  call g:RubyDebugger.queue.add("exit")
   call s:clear_current_state()
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
@@ -462,8 +614,23 @@ function! RubyDebugger.commands.jump_to_breakpoint(cmd) dict
   if has("signs")
     exe ":sign place " . s:current_line_sign_id . " line=" . attrs.line . " name=current_line file=" . attrs.file
   endif
+endfunction
 
-  call g:RubyDebugger.send_command('var local')
+
+" <exception file="test.rb" line="1" type="NameError" message="some exception message" threadId="4" />
+" Show message error and jump to given file/line
+function! RubyDebugger.commands.handle_exception(cmd) dict
+  let message_match = matchlist(a:cmd, 'message="\(.\{-}\)"')
+  call g:RubyDebugger.commands.jump_to_breakpoint(a:cmd)
+  echo "Exception message: " . s:unescape_html(message_match[1])
+endfunction
+
+
+" <catchpointSet exception="NoMethodError"/>
+" Confirm setting of exception catcher
+function! RubyDebugger.commands.set_exception(cmd) dict
+  let attrs = s:get_tag_attributes(a:cmd)
+  call g:RubyDebugger.logger.put("Exception successfully set: " . attrs.exception)
 endfunction
 
 
@@ -482,21 +649,14 @@ function! RubyDebugger.commands.set_breakpoint(cmd)
     if expand(breakpoint.file) == expand(file_match[1]) && expand(breakpoint.line) == expand(file_match[2])
       let breakpoint.debugger_id = attrs.no
       let breakpoint.rdebug_pid = pid
+      if has_key(breakpoint, 'condition')
+        call breakpoint.add_condition(breakpoint.condition)
+      endif
     endif
   endfor
 
   call g:RubyDebugger.logger.put("Breakpoint is set: " . file_match[1] . ":" . file_match[2])
-
-  " If there are not assigned breakpoints, assign them!
-  let not_assigned_breakpoints = filter(copy(g:RubyDebugger.breakpoints), '!has_key(v:val, "rdebug_pid") || v:val["rdebug_pid"] != ' . pid)
-  let not_assigned_breakpoint = get(not_assigned_breakpoints, 0)
-  if type(not_assigned_breakpoint) == type({})
-    call not_assigned_breakpoint.send_to_debugger()
-  else
-    " If the debugger is started, start command does nothing. If the debugger is not
-    " started, it starts the debugger *after* assigning breakpoints.
-    call g:RubyDebugger.send_command('start')
-  endif
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
@@ -557,7 +717,42 @@ function! RubyDebugger.commands.eval(cmd)
   " rdebug-ide-gem doesn't escape attributes of tag properly, so we should not
   " use usual attribute extractor here...
   let match = matchlist(a:cmd, "<eval expression=\"\\(.\\{-}\\)\" value=\"\\(.*\\)\" \\/>")
-  echo "Evaluated expression:\n" . match[1] ."\nResulted value is:\n" . match[2] . "\n"
+  echo "Evaluated expression:\n" . s:unescape_html(match[1]) ."\nResulted value is:\n" . match[2] . "\n"
+endfunction
+
+
+" <processingException type="SyntaxError" message="some message" />
+" Just show exception message
+function! RubyDebugger.commands.processing_exception(cmd)
+  let attrs = s:get_tag_attributes(a:cmd) 
+  let message = "RubyDebugger Exception, type: " . attrs.type . ", message: " . attrs.message
+  echo message
+  call g:RubyDebugger.logger.put(message)
+endfunction
+
+
+" <frames>
+"   <frame no='1' file='/path/to/file.rb' line='21' current='true' />
+"   <frame no='2' file='/path/to/file.rb' line='11' />
+" </frames>
+" Assign all frames, fill Frames window by them
+function! RubyDebugger.commands.trace(cmd)
+  let tags = s:get_tags(a:cmd)
+  let list_of_frames = []
+
+  " Create hash from list of tags
+  for tag in tags
+    let attrs = s:get_tag_attributes(tag)
+    let frame = s:Frame.new(attrs)
+    call add(list_of_frames, frame)
+  endfor
+
+  let g:RubyDebugger.frames = list_of_frames
+
+  if s:frames_window.is_open()
+    " show backtrace only if Backtrace Window is open
+    call s:frames_window.open()
+  endif
 endfunction
 
 
@@ -822,6 +1017,7 @@ function! s:window_variables_activate_node()
       call variable.open()
     endif
   endif
+  call g:RubyDebugger.queue.execute()
 endfunction
 
 
@@ -882,6 +1078,8 @@ function! s:WindowBreakpoints.render() dict
   for breakpoint in g:RubyDebugger.breakpoints
     let breakpoints .= breakpoint.render()
   endfor
+  let exceptions = map(copy(g:RubyDebugger.exceptions), 'v:val.render()')
+  let breakpoints .= "\nException breakpoints: " . join(exceptions, ", ")
   return breakpoints
 endfunction
 
@@ -927,6 +1125,60 @@ endfunction
 
 
 " *** WindowBreakpoints class (end)
+
+
+
+" *** WindowFrames class (start)
+
+" Inherits WindowFrames from Window
+let s:WindowFrames = copy(s:Window)
+
+" ** Public methods
+
+function! s:WindowFrames.bind_mappings()
+  nnoremap <buffer> <2-leftmouse> :call <SID>window_frames_activate_node()<cr>
+  nnoremap <buffer> o :call <SID>window_frames_activate_node()<cr>
+endfunction
+
+
+" Returns string that contains all frames (for Window.display())
+function! s:WindowFrames.render() dict
+  let frames = ""
+  let frames .= self.title . "\n"
+  for frame in g:RubyDebugger.frames
+    let frames .= frame.render()
+  endfor
+  return frames
+endfunction
+
+
+" Open frame under cursor
+function! s:window_frames_activate_node()
+  let frame = s:Frame.get_selected()
+  if frame != {}
+    call frame.open()
+  endif
+endfunction
+
+
+" Add syntax highlighting
+function! s:WindowFrames.setup_syntax_highlighting() dict
+    execute "syn match rdebugTitle #" . self.title . "#"
+
+    syn match rdebugId "^\d\+\s" contained nextgroup=rdebugFile
+    syn match rdebugFile ".*:" contained nextgroup=rdebugLine
+    syn match rdebugLine "\d\+" contained
+
+    syn match rdebugWrapper "^\d\+.*" contains=rdebugId transparent
+
+    hi def link rdebugId Directory
+    hi def link rdebugFile Normal
+    hi def link rdebugLine Special
+endfunction
+
+
+" *** WindowFrames class (end)
+
 
 
 
@@ -1243,7 +1495,7 @@ function! s:VarParent._init_children()
   " Get children
   if has_key(self.attributes, 'objectId')
     let g:RubyDebugger.current_variable = self
-    call g:RubyDebugger.send_command('var instance ' . self.attributes.objectId)
+    call g:RubyDebugger.queue.add('var instance ' . self.attributes.objectId)
   endif
 
 endfunction
@@ -1306,13 +1558,34 @@ function! s:Breakpoint.delete() dict
 endfunction
 
 
+" Add condition to breakpoint. If server is not running, just store it, it
+" will be evaluated after starting the server
+function! s:Breakpoint.add_condition(condition) dict
+  let self.condition = a:condition
+  if has_key(g:RubyDebugger, 'server') && g:RubyDebugger.server.is_running() && has_key(self, 'debugger_id')
+    call g:RubyDebugger.queue.add(self.condition_command())
+  endif
+endfunction
+
+
+
 " Send adding breakpoint message to debugger, if it is run
-" (e.g.: 'break /path/to/file:23')
 function! s:Breakpoint.send_to_debugger() dict
   if has_key(g:RubyDebugger, 'server') && g:RubyDebugger.server.is_running()
-    let message = 'break ' . self.file . ':' . self.line
-    call g:RubyDebugger.send_command(message)
+    call g:RubyDebugger.queue.add(self.command())
   endif
+endfunction
+
+
+" Command for setting breakpoint (e.g.: 'break /path/to/file:23')
+function! s:Breakpoint.command() dict
+  return 'break ' . self.file . ':' . self.line
+endfunction
+
+
+" Command for adding condition to breakpoin (e.g.: 'condition 1 x>5')
+function! s:Breakpoint.condition_command() dict
+  return 'condition ' . self.debugger_id . ' ' . self.condition
 endfunction
 
 
@@ -1332,7 +1605,11 @@ endfunction
 
 " Output format for Breakpoints Window
 function! s:Breakpoint.render() dict
-  return self.id . " " . (exists("self.debugger_id") ? self.debugger_id : '') . " " . self.file . ":" . self.line . "\n"
+  let output = self.id . " " . (exists("self.debugger_id") ? self.debugger_id : '') . " " . self.file . ":" . self.line
+  if exists("self.condition")
+    let output .= " " . self.condition
+  endif
+  return output . "\n"
 endfunction
 
 
@@ -1369,12 +1646,131 @@ endfunction
 function! s:Breakpoint._send_delete_to_debugger() dict
   if has_key(g:RubyDebugger, 'server') && g:RubyDebugger.server.is_running()
     let message = 'delete ' . self.debugger_id
-    call g:RubyDebugger.send_command(message)
+    call g:RubyDebugger.queue.add(message)
   endif
 endfunction
 
 
 " *** Breakpoint class (end)
+
+" *** Exception class (start)
+" These are ruby exceptions we catch with 'catch Exception' command
+" (:RdbCatch)
+
+let s:Exception = { }
+
+" ** Public methods
+
+" Constructor of new exception.
+function! s:Exception.new(name)
+  let var = copy(self)
+  let var.name = a:name
+  call var._log("Trying to set exception: " . var.name)
+  call g:RubyDebugger.queue.add(var.command())
+  return var
+endfunction
+
+
+" Command for setting exception (e.g.: 'catch NameError')
+function! s:Exception.command() dict
+  return 'catch ' . self.name
+endfunction
+
+
+" Output format for Breakpoints Window
+function! s:Exception.render() dict
+  return self.name
+endfunction
+
+
+" ** Private methods
+
+
+function! s:Exception._log(string) dict
+  call g:RubyDebugger.logger.put(a:string)
+endfunction
+
+
+" *** Exception class (end)
+
+
+
+
+" *** Frame class (start)
+
+let s:Frame = { }
+
+" ** Public methods
+
+" Constructor of new frame. 
+" Create new frame and set sign to it.
+function! s:Frame.new(attrs)
+  let var = copy(self)
+  let var.no = a:attrs.no
+  let var.file = a:attrs.file
+  let var.line = a:attrs.line
+  if has_key(a:attrs, 'current')
+    let var.current = (a:attrs.current == 'true')
+  else
+    let var.current = 0
+  endif
+  "let s:sign_id += 1
+  "let var.sign_id = s:sign_id
+  "call var._set_sign()
+  return var
+endfunction
+
+
+" Find and return frame under cursor
+function! s:Frame.get_selected() dict
+  let line = getline(".") 
+  let match = matchlist(line, '^\(\d\+\)') 
+  let no = get(match, 1)
+  let frames = filter(copy(g:RubyDebugger.frames), "v:val.no == " . no)
+  if !empty(frames)
+    return frames[0]
+  else
+    return {}
+  endif
+endfunction
+
+
+" Output format for Frame Window
+function! s:Frame.render() dict
+  return self.no . (self.current ? ' Current' : ''). " " . self.file . ":" . self.line . "\n"
+endfunction
+
+
+" Open frame in existed/new window
+function! s:Frame.open() dict
+  call s:jump_to_file(self.file, self.line)
+endfunction
+
+
+" ** Private methods
+
+function! s:Frame._log(string) dict
+  call g:RubyDebugger.logger.put(a:string)
+endfunction
+
+
+function! s:Frame._set_sign() dict
+  if has("signs")
+    exe ":sign place " . self.sign_id . " line=" . self.line . " name=frame file=" . self.file
+  endif
+endfunction
+
+
+function! s:Frame._unset_sign() dict
+  if has("signs")
+    exe ":sign unplace " . self.sign_id
+  endif
+endfunction
+
+
+" *** Frame class (end)
+
+
 
 " *** Server class (start)
 
@@ -1520,6 +1916,7 @@ endif
 " Creating windows
 let s:variables_window = s:WindowVariables.new("variables", "Variables_Window")
 let s:breakpoints_window = s:WindowBreakpoints.new("breakpoints", "Breakpoints_Window")
+let s:frames_window = s:WindowFrames.new("frames", "Backtrace_Window")
 
 " Init logger. The plugin logs all its actions. If you have some troubles,
 " this file can help
@@ -1527,6 +1924,7 @@ let s:logger_file = s:runtime_dir . '/tmp/ruby_debugger_log'
 let RubyDebugger.logger = s:Logger.new(s:logger_file)
 let s:variables_window.logger = RubyDebugger.logger
 let s:breakpoints_window.logger = RubyDebugger.logger
+let s:frames_window.logger = RubyDebugger.logger
 
 
 " *** Creating instances (end)
