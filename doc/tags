@@ -82,6 +82,7 @@
 :CVSWatchOn	vcscommand.txt	/*:CVSWatchOn*
 :CVSWatchRemove	vcscommand.txt	/*:CVSWatchRemove*
 :CVSWatchers	vcscommand.txt	/*:CVSWatchers*
+:CheckSyntax	checksyntax.txt	/*:CheckSyntax*
 :Cligs	twitvim.txt	/*:Cligs*
 :CommandT	command-t.txt	/*:CommandT*
 :CommandTFlush	command-t.txt	/*:CommandTFlush*
@@ -140,6 +141,8 @@
 :PreviousTwitter	twitvim.txt	/*:PreviousTwitter*
 :ProfileTwitter	twitvim.txt	/*:ProfileTwitter*
 :PublicTwitter	twitvim.txt	/*:PublicTwitter*
+:QuickfixsignsSelect	quickfixsigns.txt	/*:QuickfixsignsSelect*
+:QuickfixsignsSet	quickfixsigns.txt	/*:QuickfixsignsSet*
 :RateLimitTwitter	twitvim.txt	/*:RateLimitTwitter*
 :RefreshTwitter	twitvim.txt	/*:RefreshTwitter*
 :RepliesTwitter	twitvim.txt	/*:RepliesTwitter*
@@ -227,6 +230,7 @@
 :VikiMode	viki.txt	/*:VikiMode*
 :VikiQuote	viki.txt	/*:VikiQuote*
 :Zima	twitvim.txt	/*:Zima*
+<F5>	checksyntax.txt	/*<F5>*
 AND	dbext.txt	/*AND*
 CreateBundleSnippet	snippets_emu.txt	/*CreateBundleSnippet*
 CreateSnippet	snippets_emu.txt	/*CreateSnippet*
@@ -320,6 +324,11 @@ NERDTreeOptions	NERD_tree.txt	/*NERDTreeOptions*
 NERD_commenter.txt	NERD_commenter.txt	/*NERD_commenter.txt*
 NERD_tree.txt	NERD_tree.txt	/*NERD_tree.txt*
 ODBC	dbext.txt	/*ODBC*
+QuickfixsignsBalloon()	quickfixsigns.txt	/*QuickfixsignsBalloon()*
+QuickfixsignsClear()	quickfixsigns.txt	/*QuickfixsignsClear()*
+QuickfixsignsSelect()	quickfixsigns.txt	/*QuickfixsignsSelect()*
+QuickfixsignsSet()	quickfixsigns.txt	/*QuickfixsignsSet()*
+QuickfixsignsUpdate()	quickfixsigns.txt	/*QuickfixsignsUpdate()*
 TCommentDefineType()	tComment.txt	/*TCommentDefineType()*
 Tlist_Get_Tag_Prototype_By_Line()	taglist.txt	/*Tlist_Get_Tag_Prototype_By_Line()*
 Tlist_Get_Tagname_By_Line()	taglist.txt	/*Tlist_Get_Tagname_By_Line()*
@@ -425,6 +434,8 @@ b:vikiNameSuffix	viki.txt	/*b:vikiNameSuffix*
 b:vikiNoSimpleNames	viki.txt	/*b:vikiNoSimpleNames*
 b:vikiParent	viki.txt	/*b:vikiParent*
 basic-snippet	snippets_emu.txt	/*basic-snippet*
+checksyntax#Check()	checksyntax.txt	/*checksyntax#Check()*
+checksyntax.txt	checksyntax.txt	/*checksyntax.txt*
 command-t	command-t.txt	/*command-t*
 command-t-authors	command-t.txt	/*command-t-authors*
 command-t-commands	command-t.txt	/*command-t-commands*
@@ -628,6 +639,7 @@ g:SuperTabMappingForward	supertab.txt	/*g:SuperTabMappingForward*
 g:SuperTabMappingTabLiteral	supertab.txt	/*g:SuperTabMappingTabLiteral*
 g:SuperTabMidWordCompletion	supertab.txt	/*g:SuperTabMidWordCompletion*
 g:SuperTabRetainCompletionDuration	supertab.txt	/*g:SuperTabRetainCompletionDuration*
+g:checksyntax	checksyntax.txt	/*g:checksyntax*
 g:fuf_abbrevMap	fuf.txt	/*g:fuf_abbrevMap*
 g:fuf_bookmark_keyDelete	fuf.txt	/*g:fuf_bookmark_keyDelete*
 g:fuf_bookmark_prompt	fuf.txt	/*g:fuf_bookmark_prompt*
@@ -692,6 +704,21 @@ g:fuf_taggedfile_switchOrder	fuf.txt	/*g:fuf_taggedfile_switchOrder*
 g:fuf_timeFormat	fuf.txt	/*g:fuf_timeFormat*
 g:fuf_useMigemo	fuf.txt	/*g:fuf_useMigemo*
 g:loaded_rails	rails.txt	/*g:loaded_rails*
+g:quickfixsigns#marks#marks	quickfixsigns.txt	/*g:quickfixsigns#marks#marks*
+g:quickfixsigns#use_relativenumber	quickfixsigns.txt	/*g:quickfixsigns#use_relativenumber*
+g:quickfixsigns#vcsdiff#highlight	quickfixsigns.txt	/*g:quickfixsigns#vcsdiff#highlight*
+g:quickfixsigns_balloon	quickfixsigns.txt	/*g:quickfixsigns_balloon*
+g:quickfixsigns_blacklist_buffer	quickfixsigns.txt	/*g:quickfixsigns_blacklist_buffer*
+g:quickfixsigns_class_cursor	quickfixsigns.txt	/*g:quickfixsigns_class_cursor*
+g:quickfixsigns_class_loc	quickfixsigns.txt	/*g:quickfixsigns_class_loc*
+g:quickfixsigns_class_marks	quickfixsigns.txt	/*g:quickfixsigns_class_marks*
+g:quickfixsigns_class_qfl	quickfixsigns.txt	/*g:quickfixsigns_class_qfl*
+g:quickfixsigns_class_rel	quickfixsigns.txt	/*g:quickfixsigns_class_rel*
+g:quickfixsigns_class_vcsdiff	quickfixsigns.txt	/*g:quickfixsigns_class_vcsdiff*
+g:quickfixsigns_classes	quickfixsigns.txt	/*g:quickfixsigns_classes*
+g:quickfixsigns_events	quickfixsigns.txt	/*g:quickfixsigns_events*
+g:quickfixsigns_icons	quickfixsigns.txt	/*g:quickfixsigns_icons*
+g:quickfixsigns_max	quickfixsigns.txt	/*g:quickfixsigns_max*
 g:rails_abbreviations	rails.txt	/*g:rails_abbreviations*
 g:rails_ctags_arguments	rails.txt	/*g:rails_ctags_arguments*
 g:rails_dbext	rails.txt	/*g:rails_dbext*
@@ -776,6 +803,7 @@ hl-twitterReply	twitvim.txt	/*hl-twitterReply*
 hl-twitterTime	twitvim.txt	/*hl-twitterTime*
 hl-twitterTitle	twitvim.txt	/*hl-twitterTitle*
 hl-twitterUser	twitvim.txt	/*hl-twitterUser*
+i_<F5>	checksyntax.txt	/*i_<F5>*
 i_CTRL-G_S	surround.txt	/*i_CTRL-G_S*
 i_CTRL-G_s	surround.txt	/*i_CTRL-G_s*
 ingres	dbext.txt	/*ingres*
@@ -804,6 +832,13 @@ project-settings	project.txt	/*project-settings*
 project-syntax	project.txt	/*project-syntax*
 project-tips	project.txt	/*project-tips*
 project.txt	project.txt	/*project.txt*
+quickfixsigns#CompleteSelect()	quickfixsigns.txt	/*quickfixsigns#CompleteSelect()*
+quickfixsigns#RelNumbersOnce()	quickfixsigns.txt	/*quickfixsigns#RelNumbersOnce()*
+quickfixsigns#marks#GetList()	quickfixsigns.txt	/*quickfixsigns#marks#GetList()*
+quickfixsigns#marks#GetSign()	quickfixsigns.txt	/*quickfixsigns#marks#GetSign()*
+quickfixsigns#vcsdiff#GetList()	quickfixsigns.txt	/*quickfixsigns#vcsdiff#GetList()*
+quickfixsigns#vcsdiff#GuessType()	quickfixsigns.txt	/*quickfixsigns#vcsdiff#GuessType()*
+quickfixsigns.txt	quickfixsigns.txt	/*quickfixsigns.txt*
 ragtag	ragtag.txt	/*ragtag*
 ragtag-CTRL-V_%	ragtag.txt	/*ragtag-CTRL-V_%*
 ragtag-CTRL-V_&	ragtag.txt	/*ragtag-CTRL-V_&*
