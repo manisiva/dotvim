@@ -16,6 +16,3 @@
 [submodule "bundle/haml"]
 	path = bundle/haml
 	url = https://github.com/tpope/vim-haml.git
-[submodule "bundle/command-t"]
-	path = bundle/command-t
-	url = https://github.com/vim-scripts/Command-T.git
