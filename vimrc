@@ -23,6 +23,10 @@ if &t_Co > 2 || has("gui_running")
   set hlsearch
 endif
 
+" pathogen config
+call pathogen#runtime_append_all_bundles()
+call pathogen#helptags()
+
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")
   " Enable file type detection.

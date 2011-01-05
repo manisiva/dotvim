@@ -1,3 +1,18 @@
 [submodule "bundle/command-t"]
 	path = bundle/command-t
 	url = git://git.wincent.com/command-t.git
+[submodule "bundle/fugitive"]
+	path = bundle/fugitive
+	url = http://github.com/tpope/vim-fugitive.git
+[submodule "bundle/rails"]
+	path = bundle/rails
+	url = https://github.com/tpope/vim-rails.git
+[submodule "bundle/syntastic"]
+	path = bundle/syntastic
+	url = https://github.com/tpope/syntastic.git
+[submodule "bundle/speeddating"]
+	path = bundle/speeddating
+	url = https://github.com/tpope/vim-speeddating.git
+[submodule "bundle/ruby-debugger"]
+	path = bundle/ruby-debugger
+	url = https://github.com/astashov/vim-ruby-debugger.git
