@@ -1,8 +1,9 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =6
+let g:netrw_dirhist_cnt =7
 let g:netrw_dirhist_1='/home/dhruva/work/artha42/jagent/test'
 let g:netrw_dirhist_2='/home/dhruva/.devilspie'
 let g:netrw_dirhist_3='/home/dhruva/work/artha42/agent'
 let g:netrw_dirhist_4='/home/dhruva/.rvm/gems/jruby-1.5.3/gems/activesupport-3.0.3'
 let g:netrw_dirhist_5='/home/dhruva/work/finddining/.git'
 let g:netrw_dirhist_6='/home/dhruva/work/artha42/phr_repo'
+let g:netrw_dirhist_7='/home/dhruva/.vim'
