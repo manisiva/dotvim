@@ -25,7 +25,7 @@ endif
 
 " pathogen config
 call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
+"call pathogen#helptags()
 
 " Only do this part when compiled with support for autocommands.
 if has("autocmd")

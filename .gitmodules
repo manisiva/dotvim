@@ -52,9 +52,6 @@
 [submodule "bundle/nerd_commenter"]
 	path = bundle/nerd_commenter
 	url = https://github.com/vim-scripts/The-NERD-Commenter.git
-[submodule "matchit.zip"]
-	path = matchit.zip
-	url = https://github.com/vim-scripts/matchit.zip.git
 [submodule "bundle/nerd_tree"]
 	path = bundle/nerd_tree
 	url = https://github.com/vim-scripts/NERD_tree-Project.git
@@ -79,3 +76,6 @@
 [submodule "bundle/l9"]
 	path = bundle/l9
 	url = https://github.com/vim-scripts/L9.git
+[submodule "bundle/matchit"]
+	path = bundle/matchit
+	url = https://github.com/vim-scripts/matchit.zip.git
