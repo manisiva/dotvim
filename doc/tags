@@ -82,7 +82,6 @@
 :CVSWatchOn	vcscommand.txt	/*:CVSWatchOn*
 :CVSWatchRemove	vcscommand.txt	/*:CVSWatchRemove*
 :CVSWatchers	vcscommand.txt	/*:CVSWatchers*
-:CheckSyntax	checksyntax.txt	/*:CheckSyntax*
 :Cligs	twitvim.txt	/*:Cligs*
 :CommandT	command-t.txt	/*:CommandT*
 :CommandTFlush	command-t.txt	/*:CommandTFlush*
@@ -229,7 +228,6 @@
 :VikiMode	viki.txt	/*:VikiMode*
 :VikiQuote	viki.txt	/*:VikiQuote*
 :Zima	twitvim.txt	/*:Zima*
-<F5>	checksyntax.txt	/*<F5>*
 AND	dbext.txt	/*AND*
 CreateBundleSnippet	snippets_emu.txt	/*CreateBundleSnippet*
 CreateSnippet	snippets_emu.txt	/*CreateSnippet*
@@ -444,8 +442,6 @@ b:vikiNameSuffix	viki.txt	/*b:vikiNameSuffix*
 b:vikiNoSimpleNames	viki.txt	/*b:vikiNoSimpleNames*
 b:vikiParent	viki.txt	/*b:vikiParent*
 basic-snippet	snippets_emu.txt	/*basic-snippet*
-checksyntax#Check()	checksyntax.txt	/*checksyntax#Check()*
-checksyntax.txt	checksyntax.txt	/*checksyntax.txt*
 command-t	command-t.txt	/*command-t*
 command-t-authors	command-t.txt	/*command-t-authors*
 command-t-commands	command-t.txt	/*command-t-commands*
@@ -465,7 +461,6 @@ command-t-website	command-t.txt	/*command-t-website*
 command-t-wildignore	command-t.txt	/*command-t-wildignore*
 command-t.txt	command-t.txt	/*command-t.txt*
 creating-snippets	snippets_emu.txt	/*creating-snippets*
-cs	surround.txt	/*cs*
 cvscommand-changes	vcscommand.txt	/*cvscommand-changes*
 database-extension	dbext.txt	/*database-extension*
 db2	dbext.txt	/*db2*
@@ -522,7 +517,6 @@ dbext-tutorial-variables	dbext.txt	/*dbext-tutorial-variables*
 dbext.txt	dbext.txt	/*dbext.txt*
 dbext.vim	dbext.txt	/*dbext.vim*
 deplate	viki.txt	/*deplate*
-ds	surround.txt	/*ds*
 fuf	fuf.txt	/*fuf*
 fuf-abbreviation	fuf.txt	/*fuf-abbreviation*
 fuf-about	fuf.txt	/*fuf-about*
@@ -615,7 +609,6 @@ g:SuperTabMappingForward	supertab.txt	/*g:SuperTabMappingForward*
 g:SuperTabMappingTabLiteral	supertab.txt	/*g:SuperTabMappingTabLiteral*
 g:SuperTabMidWordCompletion	supertab.txt	/*g:SuperTabMidWordCompletion*
 g:SuperTabRetainCompletionDuration	supertab.txt	/*g:SuperTabRetainCompletionDuration*
-g:checksyntax	checksyntax.txt	/*g:checksyntax*
 g:fuf_abbrevMap	fuf.txt	/*g:fuf_abbrevMap*
 g:fuf_bookmark_keyDelete	fuf.txt	/*g:fuf_bookmark_keyDelete*
 g:fuf_bookmark_prompt	fuf.txt	/*g:fuf_bookmark_prompt*
@@ -748,9 +741,6 @@ hl-twitterReply	twitvim.txt	/*hl-twitterReply*
 hl-twitterTime	twitvim.txt	/*hl-twitterTime*
 hl-twitterTitle	twitvim.txt	/*hl-twitterTitle*
 hl-twitterUser	twitvim.txt	/*hl-twitterUser*
-i_<F5>	checksyntax.txt	/*i_<F5>*
-i_CTRL-G_S	surround.txt	/*i_CTRL-G_S*
-i_CTRL-G_s	surround.txt	/*i_CTRL-G_s*
 ingres	dbext.txt	/*ingres*
 interbase	dbext.txt	/*interbase*
 interviki	viki.txt	/*interviki*
@@ -908,14 +898,6 @@ supertab-midword	supertab.txt	/*supertab-midword*
 supertab-options	supertab.txt	/*supertab-options*
 supertab-usage	supertab.txt	/*supertab-usage*
 supertab.txt	supertab.txt	/*supertab.txt*
-surround	surround.txt	/*surround*
-surround-author	surround.txt	/*surround-author*
-surround-customizing	surround.txt	/*surround-customizing*
-surround-issues	surround.txt	/*surround-issues*
-surround-mappings	surround.txt	/*surround-mappings*
-surround-replacements	surround.txt	/*surround-replacements*
-surround-targets	surround.txt	/*surround-targets*
-surround.txt	surround.txt	/*surround.txt*
 tComment-Installation	tComment.txt	/*tComment-Installation*
 tComment-Key-Bindings	tComment.txt	/*tComment-Key-Bindings*
 tComment-Usage	tComment.txt	/*tComment-Usage*
@@ -1294,8 +1276,3 @@ vimspell-requirements	vimspell.txt	/*vimspell-requirements*
 vimspell-todo	vimspell.txt	/*vimspell-todo*
 vimspell.txt	vimspell.txt	/*vimspell.txt*
 vimspell_default_language	vimspell.txt	/*vimspell_default_language*
-vs	surround.txt	/*vs*
-yS	surround.txt	/*yS*
-ySS	surround.txt	/*ySS*
-ys	surround.txt	/*ys*
-yss	surround.txt	/*yss*
