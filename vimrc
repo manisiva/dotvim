@@ -52,9 +52,10 @@ if has("autocmd")
           \ if line("'\"") > 0 && line("'\"") <= line("$") |
           \   exe "normal g`\"" |
           \ endif
+
+    " Automatically load .vimrc changes
+    autocmd BufWritePost .vimrc source $MYVIMRC 
   augroup END
-else
-  set autoindent		" always set autoindenting on
 endif " has("autocmd")
 
 color railscasts
@@ -73,8 +74,7 @@ vmap <C-C> "+y
 vmap <C-X> "+x
 imap <C-V> <SPACE><ESC>"+gPi
 
-"map <S-Up> dd <up>P
-map <S-Up> dd P
+map <S-Up> dd <up>P
 map <S-Down> dd p
 
 "These are mappings for the longlines mode equivalent"
