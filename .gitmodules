@@ -49,9 +49,6 @@
 [submodule "bundle/pathogen"]
 	path = bundle/pathogen
 	url = https://github.com/tpope/vim-pathogen.git
-[submodule "bundle/nerd_commenter"]
-	path = bundle/nerd_commenter
-	url = https://github.com/vim-scripts/The-NERD-Commenter.git
 [submodule "bundle/snipmate"]
 	path = bundle/snipmate
 	url = https://github.com/msanders/snipmate.vim.git
@@ -82,3 +79,9 @@
 [submodule "bundle/nerd_tree_with_ack"]
 	path = bundle/nerd_tree_with_ack
 	url = https://github.com/vim-scripts/NERD_Tree-and-ack.git
+[submodule "bundle/nerd_commenter"]
+	path = bundle/nerd_commenter
+	url = https://github.com/scrooloose/nerdcommenter.git
+[submodule "bundle/csapprox"]
+	path = bundle/csapprox
+	url = https://github.com/vim-scripts/CSApprox.git
