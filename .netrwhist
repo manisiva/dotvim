@@ -1,5 +1,5 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =8
+let g:netrw_dirhist_cnt =9
 let g:netrw_dirhist_1='/home/dhruva/work/artha42/jagent/test'
 let g:netrw_dirhist_2='/home/dhruva/.devilspie'
 let g:netrw_dirhist_3='/home/dhruva/work/artha42/agent'
@@ -8,3 +8,4 @@ let g:netrw_dirhist_5='/home/dhruva/work/finddining/.git'
 let g:netrw_dirhist_6='/home/dhruva/work/artha42/phr_repo'
 let g:netrw_dirhist_7='/home/dhruva/.vim'
 let g:netrw_dirhist_8='/home/dhruva/work/artha42/phr_app/.git'
+let g:netrw_dirhist_9='/home/dhruva/work/artha42/mongomapper'
