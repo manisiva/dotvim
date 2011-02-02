@@ -6,15 +6,15 @@ endif
 " This must be first, because it changes other options as a side effect.
 set nocompatible
 
-set backspace=indent,eol,start " allow backspacing over everything in insert mode
-set nobackup		" do not keep a backup file, use versions instead
+set backspace=indent,eol,start  " allow backspacing over everything in insert mode
+set nobackup		  " do not keep a backup file, use versions instead
 set nowritebackup " do not write to backup file
-set noswapfile " do not create swap file
+set noswapfile    " do not create swap file
 
 set history=50		" keep 50 lines of command line history
-set ruler		" show the cursor position all the time
-set showcmd		" display incomplete commands
-set incsearch		" do incremental searching
+set ruler		      " show the cursor position all the time
+set showcmd		    " display incomplete commands
+set incsearch		  " do incremental searching
 
 " Switch syntax highlighting on, when the terminal has colors
 " Also switch on highlighting the last used search pattern.
@@ -45,6 +45,8 @@ if has("autocmd")
     " For all ruby files
     autocmd FileType ruby,eruby,yaml set ai sw=2 sts=2 et 
 
+    autocmd FileType yaml set foldmethod=indent
+
     " When editing a file, always jump to the last known cursor position.
     " Don't do it when the position is invalid or when inside an event handler
     " (happens when dropping a file on gvim).
@@ -54,6 +56,7 @@ if has("autocmd")
           \ endif
 
     " Automatically load .vimrc changes
+    autocmd BufWritePost vimrc source $MYVIMRC 
     autocmd BufWritePost .vimrc source $MYVIMRC 
   augroup END
 endif " has("autocmd")
@@ -89,14 +92,15 @@ vnoremap <Up> gk
 inoremap <Down> <C-o>gj
 inoremap <Up> <C-o>gk
 
-"Common Plugins
+" Common Plugins
 syntax on
 filetype plugin indent on
 
-runtime! ftdetect/*.vim " filetype plugins
-runtime! macros/matchit.vim " advanced % matching
+runtime! ftdetect/*.vim     " Filetype plugins
+runtime! macros/matchit.vim " Advanced % matching
 
-set foldmethod=syntax " folding based on syntax
+" Folding based on syntax
+set foldmethod=syntax
 
 let g:xml_syntax_folding=1
 au FileType xml exe ":silent 1,$!xmllint --format --recover - 2>/dev/null"  
@@ -107,10 +111,10 @@ map fmt :silent 1,$!xmllint --format --recover - 2>/dev/null<CR>
 set linebreak
 set cursorline
 
-" remove the annoying beep
+" Remove the annoying beep
 set vb t_vb="""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" ruby debug-ide settings
+" Ruby debug-ide settings
 let g:ruby_debugger_fast_sender = 1
 map <F5> :call g:RubyDebugger.step()<CR>
 map <F6> :call g:RubyDebugger.next()<CR>
@@ -128,23 +132,30 @@ let Tlist_Exit_OnlyWindow=1
 let Tlist_File_Fold_Auto_Close=1
 let Tlist_Enable_Fold_Column=0
 
+" Statusline modifications, added Fugitive Status Line & Syntastic Error
+" Message
 set statusline=[%t]\ [Type=%y]\ %{fugitive#statusline()}
-
 set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
-"improve autocomplete menu colors
+" Improve autocomplete menu colors
 highlight PMenu gui=bold guibg=#444444 guifg=#CECECE
 
-set guioptions-=m  "remove menu bar
-set guioptions-=T  "remove toolbar
-set guioptions-=r  "remove right-hand scroll bar 
-set guioptions-=L  "remove left-hand scroll bar
+set guioptions-=m  " Remove menu bar
+set guioptions-=T  " Remove toolbar
+set guioptions-=r  " Remove right-hand scroll bar 
+set guioptions-=L  " Remove left-hand scroll bar
 
-set dictionary=/usr/share/dict/words "vim supports dictionary autocomplete
+" Vim supports dictionary autocomplete
+set dictionary=/usr/share/dict/words 
 
-let g:syntastic_enable_signs=1 " syntastic settng for vim to use |:sign| for marking syntax errors 
+" syntastic settng for vim to use |:sign| for marking syntax errors 
+let g:syntastic_enable_signs=1 
 
-" remap command key
+" Remap command key
 nnoremap <Leader>T :CommandT<CR> 
+
+" Provides nice wild menu completion, makes command completion in ambigous
+" case very easy
+set wildmenu wildmode=full 
