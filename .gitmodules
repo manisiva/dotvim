@@ -91,3 +91,9 @@
 [submodule "bundle/syntastic"]
 	path = bundle/syntastic
 	url = https://github.com/scrooloose/syntastic.git
+[submodule "bundle/sinatra"]
+	path = bundle/sinatra
+	url = https://github.com/hallison/vim-ruby-sinatra.git
+[submodule "bundle/ruby_debugger"]
+	path = bundle/ruby_debugger
+	url = https://github.com/astashov/vim-ruby-debugger.git
