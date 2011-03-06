@@ -100,6 +100,3 @@
 [submodule "bundle/conque_term"]
 	path = bundle/conque_term
 	url = https://github.com/rygwdn/vim-conque.git
-[submodule "bundle/snipmate-snippets/snippets"]
-	path = bundle/snipmate-snippets/snippets
-	url = https://github.com/spf13/snipmate-snippets.git
