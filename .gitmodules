@@ -103,3 +103,6 @@
 [submodule "bundle/mexpolk-snippets/snippets"]
 	path = bundle/mexpolk-snippets/snippets
 	url = https://github.com/mexpolk/snipmate-snippets.git
+[submodule "bundle/dhrvuasagar-snippets/snippets"]
+	path = bundle/dhrvuasagar-snippets/snippets
+	url = git@github.com:dhruvasagar/snipmate-snippets.git
