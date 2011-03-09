@@ -100,9 +100,9 @@
 [submodule "bundle/conque_term"]
 	path = bundle/conque_term
 	url = https://github.com/rygwdn/vim-conque.git
-[submodule "bundle/mexpolk-snippets/snippets"]
-	path = bundle/mexpolk-snippets/snippets
-	url = https://github.com/mexpolk/snipmate-snippets.git
 [submodule "bundle/dhrvuasagar-snippets/snippets"]
 	path = bundle/dhrvuasagar-snippets/snippets
 	url = git@github.com:dhruvasagar/snipmate-snippets.git
+[submodule "bundle/ruby_ri"]
+	path = bundle/ruby_ri
+	url = https://github.com/vim-scripts/PA_ruby_ri.git
