@@ -7,39 +7,26 @@ if exists("g:loaded_dnote") || &cp
   finish
 endif
 let g:loaded_dnote = 1
+let s:keepcpo = &cpo
+set cpo&vim
 
-if !executable('dnote')
+let s:dnote="dnote"
+let s:dnote_buffer="dnote_buffer"
+
+if !executable(s:dnote)
   finish
 endif
 
-if !exists("g:dnote")
-  let g:dnote="dnote"
-endif
-
-function! s:OpenIfNew(name)
-  let buf_no = bufnr(expand(a:name))
-  if buf_no > 0
-    execute 'bw! '.a:name
-  endif
-  execute ':sp '.a:name
-endfunction
-
- 
-function! s:Dnote()
-  let l:dnote_filename = 'dnote'
-  if bufnr(l:dnote_filename) > 0
-    execute 'bd! '.l:dnote_filename
-  endif
-  execute 'new '.l:dnote_filename
-
-  let old_report=&report
-  let &report=9999
-  set modifiable
-  execute "silent execute ':0r!".g:dnote." '"
-  set nomodifiable
-  set buftype="quickfix"
-  let &report=old_report
-  execute 'normal 1G'
-endfunction
-
 command! -nargs=? Dnote :call s:Dnote()
+
+function! s:Dnote()
+  let l:prev_bufnr = bufnr('%')
+  if bufnr("dnote_buffer") > 0
+    execute 'silent bdelete dnote_buffer'
+  end
+  execute 'new dnote_buffer'
+  let s:dnote_bufnr = bufnr('%')
+  setlocal noro ma
+  silent execute ':0r!'.s:dnote
+  setlocal ro noma nomod nomodeline
+endfunction

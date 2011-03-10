@@ -103,6 +103,6 @@
 [submodule "bundle/dhrvuasagar-snippets/snippets"]
 	path = bundle/dhrvuasagar-snippets/snippets
 	url = git@github.com:dhruvasagar/snipmate-snippets.git
-[submodule "bundle/ruby_ri"]
-	path = bundle/ruby_ri
-	url = https://github.com/vim-scripts/PA_ruby_ri.git
+[submodule "bundle/ri"]
+	path = bundle/ri
+	url = git@github.com:dhruvasagar/PA_ruby_ri.git
