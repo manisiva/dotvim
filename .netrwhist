@@ -1,3 +1,5 @@
 let g:netrw_dirhistmax  =10
-let g:netrw_dirhist_cnt =1
+let g:netrw_dirhist_cnt =3
 let g:netrw_dirhist_1='/home/dhruva/work/artha42/phr_repo'
+let g:netrw_dirhist_2='/home/dhruva/.rvm/gems/ruby-1.9.2-p0/gems/phr_repo-0.6.0/lib'
+let g:netrw_dirhist_3='/home/dhruva/.rvm/gems/ruby-1.9.2-p0/gems/phr_repo-0.6.0/lib/phr_repo/plugins'
