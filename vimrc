@@ -77,8 +77,15 @@ vmap <C-C> "+y
 vmap <C-X> "+x
 imap <C-V> <SPACE><ESC>"+gPi
 
-map <S-Up> dd <up>P
-map <S-Down> dd p
+"map <S-Up> dd <up>P
+"map <S-Down> dd p
+
+"Bubble single line - dependent on vim-unimpaired plugin
+nmap <C-Up> [e
+nmap <C-Down> ]e
+"Bubble multiple lines - also dependent on vim-unimpaired plugin
+vmap <C-Up> [egv
+vmap <C-Down> ]egv
 
 "These are mappings for the longlines mode equivalent"
 nnoremap j gj

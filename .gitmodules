@@ -25,9 +25,6 @@
 [submodule "bundle/pastie"]
 	path = bundle/pastie
 	url = https://github.com/tpope/vim-pastie.git
-[submodule "bundle/viki"]
-	path = bundle/viki
-	url = https://github.com/tomtom/viki_vim.git
 [submodule "bundle/bufonly"]
 	path = bundle/bufonly
 	url = https://github.com/duff/vim-bufonly.git
@@ -106,3 +103,15 @@
 [submodule "bundle/ri"]
 	path = bundle/ri
 	url = git@github.com:dhruvasagar/PA_ruby_ri.git
+[submodule "bundle/cucumber"]
+	path = bundle/cucumber
+	url = https://github.com/tpope/vim-cucumber.git
+[submodule "bundle/unimpaired"]
+	path = bundle/unimpaired
+	url = https://github.com/tpope/vim-unimpaired.git
+[submodule "bundle/repeat"]
+	path = bundle/repeat
+	url = https://github.com/tpope/vim-repeat.git
+[submodule "bundle/tabular"]
+	path = bundle/tabular
+	url = https://github.com/godlygeek/tabular.git
