@@ -55,6 +55,9 @@ if has("autocmd")
           \   exe "normal g`\"" |
           \ endif
 
+    " Automatically remove hidden fugitive buffers
+    autocmd BufReadPost fugitive://* set bufhidden=delete
+
     " Automatically load .vimrc changes
     autocmd BufWritePost vimrc source $MYVIMRC 
     autocmd BufWritePost .vimrc source $MYVIMRC 
