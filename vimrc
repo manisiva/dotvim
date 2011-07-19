@@ -159,6 +159,7 @@ set guioptions-=L  " Remove left-hand scroll bar
 
 " Vim supports dictionary autocomplete
 set dictionary=/usr/share/dict/words 
+set spell
 
 " syntastic settng for vim to use |:sign| for marking syntax errors 
 let g:syntastic_enable_signs=1 
