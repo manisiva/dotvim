@@ -118,9 +118,6 @@
 [submodule "bundle/spreadsheet"]
 	path = bundle/spreadsheet
 	url = https://github.com/vim-scripts/spreadsheet.vim.git
-[submodule "bundle/project"]
-	path = bundle/project
-	url = https://github.com/shemerey/vim-project.git
 [submodule "bundle/dbext"]
 	path = bundle/dbext
 	url = https://github.com/vim-scripts/dbext.vim.git
