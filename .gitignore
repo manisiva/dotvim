@@ -3,3 +3,5 @@
 *tmp
 *tags
 .netrwhist
+backups/*
+tmp/*
