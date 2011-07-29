@@ -41,7 +41,7 @@ endif
 
 " pathogen config
 call pathogen#runtime_append_all_bundles()
-call pathogen#helptags()
+"call pathogen#helptags()
 
 " Only do this part when compiled with support for auto commands.
 if has("autocmd")
@@ -118,6 +118,33 @@ let g:xml_syntax_folding=1
 au FileType xml exe ":silent 1,$!xmllint --format --recover - 2>/dev/null"  
 map fmt :silent 1,$!xmllint --format --recover - 2>/dev/null<CR> 
 
+" Improve autocomplete menu colors
+highlight PMenu gui=bold guibg=#444444 guifg=#CECECE
+
+set guioptions-=m  " Remove menu bar
+set guioptions-=T  " Remove toolbar
+set guioptions-=r  " Remove right-hand scroll bar 
+set guioptions-=L  " Remove left-hand scroll bar
+
+" Vim supports dictionary autocomplete Ctrl_X+Ctrl_K
+set dictionary=/usr/share/dict/words
+
+" Vim inbuilt spell check, <Leader>z= for options, <Leader>zg to add word to list
+set spell
+
+" syntastic setting for vim to use |:sign| for marking syntax errors 
+let g:syntastic_enable_signs=1 
+
+" Remap command key
+nnoremap <Leader>T :CommandT<CR> 
+
+" Provides nice wild menu completion, makes command completion in ambiguous
+" case very easy
+set wildmenu wildmode=full
+
+" Plugin Settings
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 " Ruby Debug IDE settings
 let g:ruby_debugger_fast_sender = 1
 map <F5> :call g:RubyDebugger.step()<CR>
@@ -142,26 +169,5 @@ set statusline+=%#warningmsg#
 set statusline+=%{SyntasticStatuslineFlag()}
 set statusline+=%*
 
-" Improve autocomplete menu colors
-highlight PMenu gui=bold guibg=#444444 guifg=#CECECE
-
-set guioptions-=m  " Remove menu bar
-set guioptions-=T  " Remove toolbar
-set guioptions-=r  " Remove right-hand scroll bar 
-set guioptions-=L  " Remove left-hand scroll bar
-
-" Vim supports dictionary autocomplete Ctrl_X+Ctrl_K
-set dictionary=/usr/share/dict/words
-
-" Vim inbuilt spell check, <Leader>z= for options, <Leader>zg to add word to list
-set spell
-
-" syntastic setting for vim to use |:sign| for marking syntax errors 
-let g:syntastic_enable_signs=1 
-
-" Remap command key
-nnoremap <Leader>T :CommandT<CR> 
-
-" Provides nice wild menu completion, makes command completion in ambiguous
-" case very easy
-set wildmenu wildmode=full 
+" Preview Settings
+let g:PreviewBrowsers='google-chrome'
